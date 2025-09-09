@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>K‑Profiles Style Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #121621;
+      --muted: #a1acc3;
+      --text: #e8edf7;
+      --brand: #6ea8fe;
+      --brand-2: #8b5cf6;
+      --chip: #1b2335;
+      --ring: rgba(110,168,254,.5);
+      --danger: #ef4444;
+      --ok: #10b981;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(139,92,246,.15), transparent 60%),
+                  radial-gradient(1000px 600px at 0% 0%, rgba(110,168,254,.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky; top: 0; z-index: 40;
+      backdrop-filter: saturate(1.2) blur(8px);
+      background: linear-gradient( to bottom, rgba(11,13,18,.9), rgba(11,13,18,.6) );
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .wrap { max-width: 1150px; margin: 0 auto; padding: 18px 20px; }
+
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; letter-spacing: .5px;
+      text-decoration: none; color: var(--text);
+    }
+    .brand .logo {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      display: grid; place-items: center; font-family: Outfit, Inter, sans-serif; font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center;
+    }
+
+    .searchbar {
+      display: flex; gap: 10px; align-items: center;
+      background: var(--panel); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px; padding: 10px 12px; box-shadow: var(--shadow);
+    }
+    .searchbar input {
+      all: unset; flex: 1; color: var(--text);
+    }
+    .searchbar input::placeholder { color: #94a3b8; }
+
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid rgba(255,255,255,.08); background: var(--chip);
+      padding: 8px 12px; border-radius: 999px; cursor: pointer; user-select: none;
+      font-size: 13px; color: var(--muted);
+      transition: transform .08s ease, background .2s ease, color .2s ease, border-color .2s ease;
+    }
+    .chip.active { background: linear-gradient(135deg, rgba(110,168,254,.25), rgba(139,92,246,.25)); color: var(--text); border-color: var(--ring); }
+    .chip:hover { transform: translateY(-1px); }
+
+    /* Layout */
+    main { padding: 28px 20px 80px; }
+    .grid {
+      max-width: 1150px; margin: 0 auto; display: grid; gap: 18px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .sidebar { grid-column: 1 / span 3; position: sticky; top: 76px; align-self: start; }
+    .content { grid-column: 4 / span 9; }
+
+    @media (max-width: 950px) {
+      .sidebar { grid-column: 1 / -1; position: static; }
+      .content { grid-column: 1 / -1; }
+    }
+
+    /* Sidebar card */
+    .card {
+      background: var(--panel); border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px; padding: 16px; box-shadow: var(--shadow);
+    }
+    .card h3 { margin: 6px 0 12px; font-size: 16px; letter-spacing: .2px; }
+    .legend { font-size: 13px; color: var(--muted); }
+
+    /* Profile items */
+    .profiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .item {
+      background: linear-gradient( to bottom, rgba(255,255,255,.02), rgba(255,255,255,.01) ), var(--panel);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px; overflow: hidden; position: relative; transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .item:hover { transform: translateY(-3px); border-color: var(--ring); box-shadow: 0 20px 40px rgba(0,0,0,.4); }
+
+    .thumb { aspect-ratio: 4/3; width: 100%; object-fit: cover; display: block; filter: saturate(1.05) contrast(1.02); }
+    .body { padding: 12px 14px 14px; }
+    .title { font-weight: 700; font-size: 16px; letter-spacing: .2px; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .tags { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .tag { font-size: 12px; padding: 6px 8px; background: #0e1423; border: 1px solid rgba(255,255,255,.08); border-radius: 999px; color: #93c5fd; }
+    .tag.solo { color: #c4b5fd; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; user-select: none;
+      padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.12)); color: var(--text);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: var(--ring); }
+
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; margin-bottom: 12px; }
+    .sort { background: var(--panel); padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.06); color: var(--muted); }
+
+    /* Modal */
+    dialog.profile-modal { border: none; padding: 0; background: transparent; }
+    .modal-card { width: min(840px, 92vw); background: var(--panel); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,.6); }
+    .modal-hero { position: relative; }
+    .modal-hero img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+    .modal-hero .badge { position: absolute; left: 14px; top: 14px; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.15); padding: 6px 10px; border-radius: 999px; font-size: 12px; }
+    .modal-body { padding: 16px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+    .modal-body h2 { margin: 0; letter-spacing: .2px; }
+    .kv { display: grid; grid-template-columns: 120px 1fr; gap: 8px; font-size: 14px; margin-top: 6px; }
+    .kv .k { color: var(--muted); }
+    .closebar { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid rgba(255,255,255,.08); padding: 12px 16px; }
+
+    @media (max-width: 760px) {
+      .modal-body { grid-template-columns: 1fr; }
+      .kv { grid-template-columns: 1fr; }
+    }
+
+    /* Footer */
+    footer { border-top: 1px solid rgba(255,255,255,.06); color: var(--muted); }
+    footer .wrap { display: grid; grid-template-columns: 1fr auto; gap: 16px; }
+
+    /* Hide dialog caret on Safari */
+    dialog::backdrop { background: rgba(3,6,17,.6); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap topbar">
+      <a class="brand" href="#" aria-label="Home">
+        <div class="logo">KP</div>
+        <span>K‑Profiles Demo</span>
+      </a>
+      <div class="searchbar" role="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input id="q" type="search" placeholder="Search groups, members, positions…" aria-label="Search" />
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- Left sidebar: filters / tags -->
+      <aside class="sidebar">
+        <div class="card">
+          <h3>Filter by Type</h3>
+          <div id="typeFilters" class="filters" aria-label="Profile type filters">
+            <div class="chip active" data-type="all">All</div>
+            <div class="chip" data-type="group">Groups</div>
+            <div class="chip" data-type="solo">Soloists</div>
+            <div class="chip" data-type="member">Members</div>
+          </div>
+          <p class="legend">Click on a profile to view quick details. Use the search bar for names, positions, or fandoms.</p>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="card">
+          <h3>Popular Tags</h3>
+          <div class="filters" id="tagFilters">
+            <div class="chip" data-tag="4th Gen">4th Gen</div>
+            <div class="chip" data-tag="3rd Gen">3rd Gen</div>
+            <div class="chip" data-tag="Boy Group">Boy Group</div>
+            <div class="chip" data-tag="Girl Group">Girl Group</div>
+            <div class="chip" data-tag="Leader">Leader</div>
+            <div class="chip" data-tag="Maknae">Maknae</div>
+            <div class="chip" data-tag="Main Vocal">Main Vocal</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right content: results -->
+      <section class="content">
+        <div class="toolbar">
+          <label>
+            <select id="sort" class="sort" aria-label="Sort results">
+              <option value="relevance">Sort: Relevance</option>
+              <option value="name">Sort: Name (A→Z)</option>
+              <option value="popularity">Sort: Popularity</option>
+              <option value="newest">Sort: Newest</option>
+            </select>
+          </label>
+          <button class="btn" id="resetBtn" type="button">Reset filters</button>
+        </div>
+        <div id="results" class="profiles" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>Built for demo purposes — not affiliated with kprofiles.com.</div>
+      <div>© <span id="year"></span> K‑Profiles Style Demo</div>
+    </div>
+  </footer>
+
+  <!-- Modal for quick view -->
+  <dialog class="profile-modal" id="profileModal" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-hero">
+        <img id="modalImg" alt="" />
+        <div class="badge" id="modalType"></div>
+      </div>
+      <div class="modal-body">
+        <div>
+          <h2 id="modalTitle"></h2>
+          <div class="tags" id="modalTags"></div>
+          <div class="kv" id="modalKV"></div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 8px">About</h3>
+          <p id="modalAbout" class="legend"></p>
+          <div style="height:8px"></div>
+          <button class="btn" id="openProfileBtn" type="button">Open full profile</button>
+        </div>
+      </div>
+      <div class="closebar">
+        <span class="legend">Quick view</span>
+        <div style="display:flex; gap:8px">
+          <button class="btn" id="copyLinkBtn" type="button">Copy link</button>
+          <form method="dialog">
+            <button class="btn" type="submit">Close</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // --- Demo data -----------------------------------------------------------
+    const DATA = [
+      {
+        id: 'grp-aurora',
+        type: 'group',
+        name: 'AURORA',
+        fandom: 'Aurobits',
+        debut: '2022-05-14',
+        generation: '4th Gen',
+        gender: 'Girl Group',
+        popularity: 92,
+        newest: 2022,
+        tags: ['4th Gen','Girl Group'],
+        img: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=1200&auto=format&fit=crop',
+        about: 'AURORA is a 4th‑gen 6‑member girl group known for dazzling synth‑pop and sharp synchronized choreo.',
+        meta: { Company: 'Starlite Entertainment', Members: '6', Leader: 'Hana', Debut: 'May 14, 2022' }
+      },
+      {
+        id: 'grp-neovibe',
+        type: 'group',
+        name: 'NEOVIBE',
+        fandom: 'Vibelings',
+        debut: '2020-09-01',
+        generation: '4th Gen',
+        gender: 'Boy Group',
+        popularity: 88,
+        newest: 2020,
+        tags: ['4th Gen','Boy Group'],
+        img: 'https://images.unsplash.com/photo-1542091848-1615cf1cbd9b?q=80&w=1200&auto=format&fit=crop',
+        about: 'NEOVIBE blends EDM and hip‑hop with elaborate stage design and live instruments.',
+        meta: { Company: 'Pulse Creative', Members: '7', Leader: 'J‑Min', Debut: 'Sep 1, 2020' }
+      },
+      {
+        id: 'mem-hana',
+        type: 'member',
+        name: 'Hana',
+        group: 'AURORA',
+        position: 'Leader, Main Dancer',
+        generation: '4th Gen',
+        gender: 'Girl Group',
+        popularity: 84,
+        newest: 2022,
+        tags: ['Leader','Main Dancer','4th Gen','Girl Group'],
+        img: 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=1200&auto=format&fit=crop',
+        about: 'Leader of AURORA, praised for power moves and creative direction. Former trainee for 4 years.',
+        meta: { Birthday: 'Jan 3', Height: '165 cm', MBTI: 'ENTJ', Position: 'Leader, Main Dancer' }
+      },
+      {
+        id: 'mem-jmin',
+        type: 'member',
+        name: 'J‑Min',
+        group: 'NEOVIBE',
+        position: 'Leader, Main Rapper',
+        generation: '4th Gen',
+        gender: 'Boy Group',
+        popularity: 80,
+        newest: 2020,
+        tags: ['Leader','Rapper','4th Gen','Boy Group'],
+        img: 'https://images.unsplash.com/photo-1515536765-9efc8d3b54b5?q=80&w=1200&auto=format&fit=crop',
+        about: 'NEOVIBE leader and producer with a knack for thick basslines and bilingual verses.',
+        meta: { Birthday: 'Nov 12', Height: '178 cm', MBTI: 'INTP', Position: 'Leader, Main Rapper' }
+      },
+      {
+        id: 'solo-lyra',
+        type: 'solo',
+        name: 'LYRA',
+        fandom: 'Lyrical',
+        debut: '2019-03-22',
+        generation: '3rd Gen',
+        gender: 'Soloist',
+        popularity: 86,
+        newest: 2019,
+        tags: ['3rd Gen','Solo','Main Vocal'],
+        img: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop',
+        about: 'Ballad powerhouse with frequent OST hits and acoustic live sessions.',
+        meta: { Company: 'IndieWorks', Debut: 'Mar 22, 2019', Position: 'Main Vocal' }
+      },
+      {
+        id: 'mem-mika',
+        type: 'member',
+        name: 'Mika',
+        group: 'AURORA',
+        position: 'Lead Vocalist, Maknae',
+        generation: '4th Gen',
+        gender: 'Girl Group',
+        popularity: 71,
+        newest: 2022,
+        tags: ['Maknae','Lead Vocal','4th Gen','Girl Group'],
+        img: 'https://images.unsplash.com/photo-1544006659-f0b21884ce1d?q=80&w=1200&auto=format&fit=crop',
+        about: 'Youngest member with crystalline high notes and sweet variety‑show energy.',
+        meta: { Birthday: 'Aug 27', Height: '160 cm', MBTI: 'ISFJ', Position: 'Lead Vocal, Maknae' }
+      }
+    ];
+
+    // --- Utilities -----------------------------------------------------------
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    const yearEl = document.getElementById('year');
+    yearEl.textContent = new Date().getFullYear();
+
+    const resultsEl = document.getElementById('results');
+    const qEl = document.getElementById('q');
+    const sortEl = document.getElementById('sort');
+    const typeFiltersEl = document.getElementById('typeFilters');
+    const tagFiltersEl = document.getElementById('tagFilters');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const state = {
+      q: '',
+      type: 'all',
+      tags: new Set(),
+      sort: 'relevance'
+    };
+
+    function normalize(s){ return (s||'').toLowerCase(); }
+
+    function renderCards(list){
+      resultsEl.innerHTML = '';
+      if(!list.length){
+        resultsEl.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center">No results. Try different keywords or filters.</div>`;
+        return;
+      }
+      for(const item of list){
+        const el = document.createElement('article');
+        el.className = 'item';
+        el.innerHTML = `
+          <img class="thumb" src="${item.img}" alt="${item.name} cover image"/>
+          <div class="body">
+            <div class="title">${item.name}</div>
+            <div class="meta">${item.type === 'group' ? (item.gender + ' • Debut ' + (item.debut||'N/A'))
+              : item.type === 'member' ? (item.group + ' • ' + item.position)
+              : 'Soloist • ' + (item.debut||'Debut N/A')}</div>
+            <div class="tags">${(item.tags||[]).slice(0,3).map(t=>`<span class="tag ${t.includes('Solo')?'solo':''}">${t}</span>`).join('')}</div>
+            <div style="height:10px"></div>
+            <button class="btn" data-open="${item.id}">Quick view</button>
+          </div>`;
+        resultsEl.appendChild(el);
+      }
+      $$('button[data-open]').forEach(btn=>btn.addEventListener('click',()=>openModal(btn.dataset.open)));
+    }
+
+    function applyFilters(){
+      const q = normalize(state.q);
+      const activeTags = state.tags;
+      const byType = state.type;
+
+      let list = DATA.filter(item => {
+        const inType = byType==='all' ? true : (byType==='solo' ? item.type==='solo' : item.type===byType);
+        const hay = `${item.name} ${(item.fandom||'')} ${(item.group||'')} ${(item.position||'')} ${(item.gender||'')} ${(item.generation||'')}`.toLowerCase();
+        const inSearch = q ? hay.includes(q) : true;
+        const inTags = activeTags.size ? [...activeTags].every(t => (item.tags||[]).includes(t)) : true;
+        return inType && inSearch && inTags;
+      });
+
+      switch(state.sort){
+        case 'name': list.sort((a,b)=>a.name.localeCompare(b.name)); break;
+        case 'popularity': list.sort((a,b)=>b.popularity - a.popularity); break;
+        case 'newest': list.sort((a,b)=>b.newest - a.newest); break;
+        default:
+          // simple relevance: name match > tag match > fallback to popularity
+          list.sort((a,b)=>{
+            const nq = normalize(state.q);
+            const aScore = (a.name.toLowerCase().includes(nq)?2:0) + ((a.tags||[]).some(t=>t.toLowerCase().includes(nq))?1:0) + a.popularity/100;
+            const bScore = (b.name.toLowerCase().includes(nq)?2:0) + ((b.tags||[]).some(t=>t.toLowerCase().includes(nq))?1:0) + b.popularity/100;
+            return bScore - aScore;
+          });
+      }
+
+      renderCards(list);
+    }
+
+    // Event: search
+    qEl.addEventListener('input', (e)=>{ state.q = e.target.value; applyFilters(); });
+
+    // Event: sort
+    sortEl.addEventListener('change', (e)=>{ state.sort = e.target.value; applyFilters(); });
+
+    // Event: type filters
+    typeFiltersEl.addEventListener('click', (e)=>{
+      const chip = e.target.closest('.chip'); if(!chip) return;
+      $$('.chip', typeFiltersEl).forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      state.type = chip.dataset.type;
+      applyFilters();
+    });
+
+    // Event: tag filters (toggle)
+    tagFiltersEl.addEventListener('click', (e)=>{
+      const chip = e.target.closest('.chip'); if(!chip) return;
+      chip.classList.toggle('active');
+      const tag = chip.dataset.tag;
+      if(chip.classList.contains('active')) state.tags.add(tag); else state.tags.delete(tag);
+      applyFilters();
+    });
+
+    // Reset
+    resetBtn.addEventListener('click', ()=>{
+      state.q = ''; qEl.value='';
+      state.type = 'all';
+      $$('.chip', typeFiltersEl).forEach(c=>c.classList.remove('active'));
+      $$('.chip', typeFiltersEl)[0].classList.add('active');
+      state.tags.clear();
+      $$('.chip', tagFiltersEl).forEach(c=>c.classList.remove('active'));
+      state.sort = 'relevance'; sortEl.value = 'relevance';
+      applyFilters();
+    });
+
+    // Modal logic
+    const modal = document.getElementById('profileModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalType = document.getElementById('modalType');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalTags = document.getElementById('modalTags');
+    const modalKV = document.getElementById('modalKV');
+    const modalAbout = document.getElementById('modalAbout');
+    const openProfileBtn = document.getElementById('openProfileBtn');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+
+    function openModal(id){
+      const item = DATA.find(x=>x.id===id);
+      if(!item) return;
+      modalImg.src = item.img;
+      modalImg.alt = `${item.name} photo`;
+      modalType.textContent = item.type.toUpperCase();
+      modalTitle.textContent = item.name;
+      modalTags.innerHTML = (item.tags||[]).map(t=>`<span class='tag ${t.includes('Solo')?'solo':''}'>${t}</span>`).join('');
+      modalKV.innerHTML = Object.entries(item.meta||{}).map(([k,v])=>`<div class='k'>${k}</div><div>${v}</div>`).join('');
+      modalAbout.textContent = item.about || '';
+      openProfileBtn.onclick = ()=>{
+        const url = `#/${item.id}`; // demo placeholder
+        window.location.hash = `/${item.id}`;
+        modal.close();
+      }
+      copyLinkBtn.onclick = async ()=>{
+        const url = location.origin + location.pathname + `#/${item.id}`;
+        try { await navigator.clipboard.writeText(url); copyLinkBtn.textContent = 'Copied!'; setTimeout(()=>copyLinkBtn.textContent='Copy link',1200); }
+        catch(e){ copyLinkBtn.textContent='Link copied'; setTimeout(()=>copyLinkBtn.textContent='Copy link',1200); }
+      }
+      modal.showModal();
+    }
+
+    // Deep‑link support
+    window.addEventListener('hashchange', ()=>{
+      const id = location.hash.replace('#/','');
+      if(DATA.some(x=>x.id===id)) openModal(id);
+    });
+
+    // Initial render
+    applyFilters();
+    // If hash exists on load
+    if(location.hash.startsWith('#/')){
+      const id = location.hash.replace('#/','');
+      if(DATA.some(x=>x.id===id)) openModal(id);
+    }
+  </script>
+</body>
+</html>
